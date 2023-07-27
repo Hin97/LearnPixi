@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="js/pixi.min.js"></script>
+    <style></style>
+  </head>
+  <body>
+    <script>
+      // Set up the application stage
+      const app = new PIXI.Application({ width: 641, height: 481, background: "#1099bb" })
+      // Set up the game border
+      const border = new PIXI.Graphics()
+      border.lineStyle(10, "#000000", 1)
+      border.beginFill("#1099bb")
+      border.drawRect(50, 50, 540, 380)
+      border.endFill()
+
+      // Set up the container for the game
+      const gameContainer = new PIXI.Container()
+      gameContainer.position = { x: 50, y: 50 }
+      gameContainer.width = 641
+      gameContainer.height = 481
+
+      // Initial the snake head
+      const head = new PIXI.Graphics()
+      head.beginFill("#000000")
+      head.drawRect(10, 10, 10, 10)
+      head.endFill()
+
+      // Render everything into the stage
+      document.body.appendChild(app.view)
+      app.stage.addChild(border)
+      app.stage.addChild(gameContainer)
+      gameContainer.addChild(head)
+    </script>
+  </body>
+</html>
