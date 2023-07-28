@@ -1,37 +1,80 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <script src="js/pixi.min.js"></script>
-    <style></style>
-  </head>
-  <body>
-    <script>
-      // Set up the application stage
-      const app = new PIXI.Application({ width: 641, height: 481, background: "#1099bb" })
-      // Set up the game border
-      const border = new PIXI.Graphics()
-      border.lineStyle(10, "#000000", 1)
-      border.beginFill("#1099bb")
-      border.drawRect(50, 50, 540, 380)
-      border.endFill()
 
-      // Set up the container for the game
-      const gameContainer = new PIXI.Container()
-      gameContainer.position = { x: 50, y: 50 }
-      gameContainer.width = 641
-      gameContainer.height = 481
+<head>
+  <script src="js/pixi.min.js"></script>
+  <script src="js/graphics-extras.js"></script>
+  <style></style>
+</head>
 
-      // Initial the snake head
-      const head = new PIXI.Graphics()
-      head.beginFill("#000000")
-      head.drawRect(10, 10, 10, 10)
-      head.endFill()
+<body>
+  <script>
+    // Set up the application stage
+    const app = new PIXI.Application({ width: 621, height: 496, background: "#1099bb" })
+    // Set up the game border
+    const border = new PIXI.Graphics()
+    border.lineStyle(5, "#000000", 1)
+    border.beginFill("#1099bb")
+    border.drawRect(50, 50, 520, 395)
+    border.endFill()
 
-      // Render everything into the stage
-      document.body.appendChild(app.view)
-      app.stage.addChild(border)
-      app.stage.addChild(gameContainer)
-      gameContainer.addChild(head)
-    </script>
-  </body>
+    // Set up the container for the game
+    const gameContainer = new PIXI.Container()
+    gameContainer.position = { x: 50, y: 50 }
+    gameContainer.width = 520
+    gameContainer.height = 395
+
+    // Set up components dimension
+    const snakeSize = 25;
+    const foodSize = 12.5
+    const snakeBody = [];
+
+    // Store snake body coordinate as an object
+    // Snake body will be record as block number
+    // X have 0-19 block and Y have 0-14 block
+    function storeCoordinate(xVal, yVal, array) {
+      array.push({ x: xVal, y: yVal });
+    }
+
+    // Initialise the snake 
+    // head (column 11 row 4 ) body (column 11 row3 and column 11 row 2)
+    storeCoordinate(10, 3, snakeBody)
+    storeCoordinate(10, 2, snakeBody)
+    storeCoordinate(10, 1, snakeBody)
+
+    const snake = new PIXI.Graphics()
+
+    function drawSnake() {
+      for (let i = 0; i < snakeBody.length; i++) {
+        if (i == 0) {
+          snake.beginFill("#8b0000")
+          snake.drawRoundedRect(10 + snakeBody[i].x * snakeSize, 10 + snakeBody[i].y * snakeSize, snakeSize, snakeSize, 8);
+          snake.endFill()
+
+        } else {
+          snake.beginFill("#2a2b2a")
+          snake.drawRoundedRect(10 + snakeBody[i].x * snakeSize, 10 + snakeBody[i].y * snakeSize, snakeSize, snakeSize, 8);
+          snake.endFill()
+        }
+      }
+    }
+
+    drawSnake();
+
+    // Initialise the food (coordination have to added itself)
+    // const food = new PIXI.Graphics()
+    // food.lineStyle(0)
+    // food.beginFill("#2a2b2a", 1);
+    // food.drawStar(22.5, 22.5, 4, 12.5);
+    // food.endFill();
+
+    // Render everything into the stage
+
+    document.body.appendChild(app.view)
+    app.stage.addChild(border)
+    app.stage.addChild(gameContainer)
+    gameContainer.addChild(snake)
+  </script>
+</body>
+
 </html>
