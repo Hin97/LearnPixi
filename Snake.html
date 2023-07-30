@@ -9,26 +9,37 @@
 
 <body>
   <script>
-    // Set up the application stage
+
+    // Set up the application
     const app = new PIXI.Application({ width: 621, height: 496, background: "#1099bb" })
-    // Set up the game border
-    const border = new PIXI.Graphics()
-    border.lineStyle(5, "#000000", 1)
-    border.beginFill("#1099bb")
-    border.drawRect(0, 0, 505, 380)
-    border.endFill()
-
-    // Set up the container for the game
-    const gameContainer = new PIXI.Container()
-    gameContainer.position = { x: 50, y: 50 }
-    gameContainer.width = 505
-    gameContainer.height = 380
-
-    // Set up components dimension
+    const snake = new PIXI.Graphics()
+    // Initialise game components
     const snakeSize = 25;
     const foodSize = 12.5
     const snakeBody = [];
+    var direction = "down"
 
+    function setupStage() {
+      // Set up the game border
+      const border = new PIXI.Graphics()
+      border.lineStyle(5, "#000000", 1)
+      border.beginFill("#1099bb")
+      border.drawRect(0, 0, 505, 380)
+      border.endFill()
+
+      // Set up the container for the game
+      const gameContainer = new PIXI.Container()
+      gameContainer.position = { x: 50, y: 50 }
+      gameContainer.width = 505
+      gameContainer.height = 380
+
+      // Render everything into the stage
+      document.body.appendChild(app.view)
+      gameContainer.addChild(border)
+      app.stage.addChild(gameContainer)
+      gameContainer.addChild(snake)
+
+    }
     // Store snake body coordinate as an object
     // Snake body will be record as block number
     // X have 0-19 block and Y have 0-14 block
@@ -36,14 +47,7 @@
       array.push({ x: xVal, y: yVal });
     }
 
-    // Initialise the snake 
-    // head (column 11 row 4 ) body (column 11 row3 and column 11 row 2)
-    storeCoordinate(10, 3, snakeBody)
-    storeCoordinate(10, 2, snakeBody)
-    storeCoordinate(10, 1, snakeBody)
-
-    const snake = new PIXI.Graphics()
-
+    // Draw the snake on the stage
     function drawSnake() {
       snake.clear();
       for (let i = 0; i < snakeBody.length; i++) {
@@ -51,7 +55,6 @@
           snake.beginFill("#8b0000")
           snake.drawRoundedRect(2 + snakeBody[i].x * snakeSize, 3 + snakeBody[i].y * snakeSize, snakeSize, snakeSize, 8);
           snake.endFill()
-
         } else {
           snake.beginFill("#2a2b2a")
           snake.drawRoundedRect(2 + snakeBody[i].x * snakeSize, 3 + snakeBody[i].y * snakeSize, snakeSize, snakeSize, 8);
@@ -59,25 +62,77 @@
         }
       }
     }
-    drawSnake();
 
-    function updateSnake(direction) {
+    // Update the snake position after it moves
+    function updateSnake() {
+
       let prevX = snakeBody[0].x
       let prevY = snakeBody[0].y
-      if (direction == "bottom") {
-        for (let i = 1; i < snakeBody.length; i++) {
-          let tempX = snakeBody[i].x
-          let tempY = snakeBody[i].y
-          snakeBody[i].x = prevX
-          snakeBody[i].y = prevY
-          prevX = tempX
-          prevY = tempY
-        }
-        snakeBody[0].y += 1
-        console.log(snakeBody)
+      for (let i = 1; i < snakeBody.length; i++) {
+        let tempX = snakeBody[i].x
+        let tempY = snakeBody[i].y
+        snakeBody[i].x = prevX
+        snakeBody[i].y = prevY
+        prevX = tempX
+        prevY = tempY
+      }
+      switch (direction) {
+        case "down":
+          snakeBody[0].y += 1
+          break;
+        case "left":
+          snakeBody[0].x -= 1
+          break;
+        case "right":
+          snakeBody[0].x += 1
+          break;
+        case "up":
+          snakeBody[0].y -= 1
+          break;
       }
     }
 
+    // Check whether the snake hits the wall or bites itself or gets the food
+    function checkPosition() {
+      if (snakeBody[0].x < 0 || snakeBody[0].x > 19 || snakeBody[0].y < 0 || snakeBody[0].y > 14) {
+        snake.clear();
+        app.ticker.destroy()
+        snakeBody.length = 0
+        direction = "down"
+
+      }
+    }
+
+    // Function to control the direction of the snake movement
+    function onKeyDown(key) {
+
+      // W Key is 87 and Up arrow is 38
+      if (key.keyCode === 87 || key.keyCode === 38) {
+        if (direction !== "down") {
+          direction = "up"
+        }
+      }
+      // S Key is 83 and Down arrow is 40
+      if (key.keyCode === 83 || key.keyCode === 40) {
+        if (direction !== "up") {
+          direction = "down"
+        }
+      }
+      // A Key is 65 and Left arrow is 37
+      if (key.keyCode === 65 || key.keyCode === 37) {
+        if (direction !== "right") {
+          direction = "left"
+        }
+      }
+      // D Key is 68 and Right arrow is 39
+      if (key.keyCode === 68 || key.keyCode === 39) {
+        if (direction !== "left") {
+          direction = "right"
+        }
+      }
+      // Add the 'keydown' event listener to our document
+      document.removeEventListener('keydown', onKeyDown);
+    }
 
     // Initialise the food (coordination have to added itself)
     // const food = new PIXI.Graphics()
@@ -86,23 +141,25 @@
     // food.drawStar(22.5, 22.5, 4, 12.5);
     // food.endFill();
 
-    // Render everything into the stage
-    document.body.appendChild(app.view)
-    gameContainer.addChild(border)
-    app.stage.addChild(gameContainer)
-    gameContainer.addChild(snake)
-
-
-
-    // Start game
-    let elapsed = 0.0;
-    app.ticker.add((delta) => {
-      elapsed += delta
-      if (Math.round(elapsed) == 50 || Math.round(elapsed) == 100) {
-        updateSnake("bottom")
-      }
-      drawSnake()
-    })
+    // Start new round of a game
+    function newRound() {
+      let elapsed = 0.0;
+      storeCoordinate(10, 3, snakeBody)
+      storeCoordinate(10, 2, snakeBody)
+      storeCoordinate(10, 1, snakeBody)
+      app.ticker.add((delta) => {
+        elapsed += Math.round(delta)
+        if (elapsed % 10 == 0) {
+          // Add the 'keydown' event listener to our document
+          document.addEventListener('keydown', onKeyDown);
+          updateSnake()
+          checkPosition()
+          drawSnake()
+        }
+      })
+    }
+    setupStage()
+    newRound()
 
   </script>
 </body>
