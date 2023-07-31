@@ -4,12 +4,45 @@
 <head>
   <script src="js/pixi.min.js"></script>
   <script src="js/graphics-extras.js"></script>
-  <style></style>
+  <style>
+    body {
+      width: 621px;
+      height: 496px;
+    }
+
+    #home {
+      position: absolute;
+      text-align: center;
+      width: 621px;
+      height: 496px;
+    }
+
+    #result {
+      position: absolute;
+      text-align: center;
+      width: 621px;
+      height: 496px;
+      display: none;
+    }
+
+    h1 {
+      padding: 10px;
+      margin-top: 110px;
+      font-size: 2em
+    }
+  </style>
 </head>
 
 <body>
+  <div id="home">
+    <h1>Snake</h1>
+    <button id="startBtn">Play</button>
+  </div>
+  <div id="result">
+    <h1>Game Over</h1>
+    <button id="startAgainBtn">Play</button>
+  </div>
   <script>
-
     // Set up the application
     const app = new PIXI.Application({ width: 621, height: 496, background: "#1099bb" })
     const snake = new PIXI.Graphics()
@@ -20,9 +53,8 @@
     var foodX
     var foodY
 
-
     const snakeBody = [];
-    var Gameover = false;
+    var Gameover = true;
     var direction = "down"
 
 
@@ -65,7 +97,7 @@
         }
       }
       food.lineStyle(0)
-      food.beginFill("#2a2b2a", 1);
+      food.beginFill("#00FF00", 1);
       food.drawStar(14.5 + foodX * 25, 15 + foodY * 25, 4, foodSize);
       food.endFill();
     }
@@ -121,16 +153,18 @@
     function checkPosition() {
       if (snakeBody[0].x < 0 || snakeBody[0].x > 19 || snakeBody[0].y < 0 || snakeBody[0].y > 14) {
         Gameover = true
-        console.log("Game Over")
+        direction = "down"
         food.clear()
         snakeBody.length = 0
+        showResult()
       };
       for (let i = 1; i < snakeBody.length; i++) {
         if (snakeBody[0].x == snakeBody[i].x && snakeBody[0].y == snakeBody[i].y) {
           Gameover = true
-          console.log("Game Over")
+          direction = "down"
           snakeBody.length = 0
           food.clear()
+          showResult()
         }
       }
       if (Gameover == false) {
@@ -172,29 +206,46 @@
       document.removeEventListener('keydown', onKeyDown);
     }
 
+    function hideMenu() {
+      let home = document.getElementById("home");
+      let result = document.getElementById("result")
+      home.style.display = "none"
+      result.style.display = "none"
+    }
+
+    function showResult() {
+      let result = document.getElementById("result")
+      result.style.display = "block"
+    }
 
 
     // Start new round of a game
     function newRound() {
+      Gameover = false
+      hideMenu()
       storeCoordinate(10, 4, snakeBody)
       storeCoordinate(10, 3, snakeBody)
       storeCoordinate(10, 2, snakeBody)
       storeCoordinate(10, 1, snakeBody)
       drawFood()
-      let elapsed = 0.0;
-      app.ticker.add((delta) => {
-        elapsed += Math.round(delta)
-        if (elapsed % 10 == 0 && Gameover == false) {
-          // Add the 'keydown' event listener to our document
-          document.addEventListener('keydown', onKeyDown);
-          updateSnake()
-          checkPosition()
-          drawSnake()
-        }
-      })
     }
+
+    const startBtn = document.getElementById("startBtn");
+    const startAgainBtn = document.getElementById("startAgainBtn");
+    startBtn.addEventListener("click", newRound);
+    startAgainBtn.addEventListener("click", newRound);
     setupStage()
-    newRound()
+    let elapsed = 0.0;
+    app.ticker.add((delta) => {
+      elapsed += Math.round(delta)
+      if (elapsed % 10 == 0 && Gameover == false) {
+        // Add the 'keydown' event listener to our document
+        document.addEventListener('keydown', onKeyDown);
+        updateSnake()
+        checkPosition()
+        drawSnake()
+      }
+    })
 
   </script>
 </body>
