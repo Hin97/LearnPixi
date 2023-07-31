@@ -12,25 +12,43 @@
 
     const graphics = new PIXI.Graphics()
 
-    // Rectangle
-    graphics.beginFill(0xde3249)
-    graphics.drawRect(50, 50, 100, 100)
-    graphics.endFill()
+    function draw() {// Rectangle
+      graphics.beginFill(0xde3249)
+      graphics.drawRect(50, 50, 100, 100)
+      graphics.endFill()
 
-    // const graphic = new PIXI.Graphics()
-    // Circle
-    // graphic.lineStyle(0) // draw a circle, set the lineStyle to zero so the circle doesn't have an outline
-    // graphic.beginFill(0xde3249, 1)
-    // graphic.drawCircle(250, 250, 50)
-    // graphic.endFill()
+      // const graphic = new PIXI.Graphics()
+      // Circle
+      // graphic.lineStyle(0) // draw a circle, set the lineStyle to zero so the circle doesn't have an outline
+      // graphic.beginFill(0xde3249, 1)
+      // graphic.drawCircle(250, 250, 50)
+      // graphic.endFill()
 
-    graphics.beginFill(0xde3249)
-    graphics.drawRect(100, 100, 100, 100)
-    graphics.endFill()
-
+      graphics.beginFill(0xde3249)
+      graphics.drawRect(100, 100, 100, 100)
+      graphics.endFill()
+    }
 
     app.stage.addChild(graphics)
-    app.stage.addChild(graphic)
+
+    function clear() {
+      graphics.clear()
+    }
+
+    let elapsed = 0
+    app.ticker.add((delta) => {
+      elapsed += Math.round(delta)
+      if (elapsed == 100) {
+        draw()
+      }
+      console.log(elapsed)
+      if (elapsed == 200) {
+        clear()
+      }
+    }
+    )
+
+
 
 
     // // Rectangle + line style 1

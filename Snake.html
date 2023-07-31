@@ -13,11 +13,18 @@
     // Set up the application
     const app = new PIXI.Application({ width: 621, height: 496, background: "#1099bb" })
     const snake = new PIXI.Graphics()
+    const food = new PIXI.Graphics()
     // Initialise game components
     const snakeSize = 25;
-    const foodSize = 12.5
+    const foodSize = 12.5;
+    var foodX
+    var foodY
+
+
     const snakeBody = [];
+    var Gameover = false;
     var direction = "down"
+
 
     function setupStage() {
       // Set up the game border
@@ -38,6 +45,7 @@
       gameContainer.addChild(border)
       app.stage.addChild(gameContainer)
       gameContainer.addChild(snake)
+      gameContainer.addChild(food)
 
     }
     // Store snake body coordinate as an object
@@ -47,18 +55,35 @@
       array.push({ x: xVal, y: yVal });
     }
 
+    function drawFood() {
+      food.clear()
+      foodX = Math.floor(Math.random() * 20)
+      foodY = Math.floor(Math.random() * 15)
+      for (let i = 0; i < snakeBody.length; i++) {
+        if (snakeBody[i].x == foodX && snakeBody[i].y == foodY) {
+          drawFood()
+        }
+      }
+      food.lineStyle(0)
+      food.beginFill("#2a2b2a", 1);
+      food.drawStar(14.5 + foodX * 25, 15 + foodY * 25, 4, foodSize);
+      food.endFill();
+    }
+
     // Draw the snake on the stage
     function drawSnake() {
       snake.clear();
-      for (let i = 0; i < snakeBody.length; i++) {
-        if (i == 0) {
-          snake.beginFill("#8b0000")
-          snake.drawRoundedRect(2 + snakeBody[i].x * snakeSize, 3 + snakeBody[i].y * snakeSize, snakeSize, snakeSize, 8);
-          snake.endFill()
-        } else {
-          snake.beginFill("#2a2b2a")
-          snake.drawRoundedRect(2 + snakeBody[i].x * snakeSize, 3 + snakeBody[i].y * snakeSize, snakeSize, snakeSize, 8);
-          snake.endFill()
+      if (snakeBody.length) {
+        for (let i = 0; i < snakeBody.length; i++) {
+          if (i == 0) {
+            snake.beginFill("#8b0000")
+            snake.drawRoundedRect(2 + snakeBody[i].x * snakeSize, 3 + snakeBody[i].y * snakeSize, snakeSize, snakeSize, 8);
+            snake.endFill()
+          } else {
+            snake.beginFill("#2a2b2a")
+            snake.drawRoundedRect(2 + snakeBody[i].x * snakeSize, 3 + snakeBody[i].y * snakeSize, snakeSize, snakeSize, 8);
+            snake.endFill()
+          }
         }
       }
     }
@@ -95,11 +120,24 @@
     // Check whether the snake hits the wall or bites itself or gets the food
     function checkPosition() {
       if (snakeBody[0].x < 0 || snakeBody[0].x > 19 || snakeBody[0].y < 0 || snakeBody[0].y > 14) {
-        snake.clear();
-        app.ticker.destroy()
+        Gameover = true
+        console.log("Game Over")
+        food.clear()
         snakeBody.length = 0
-        direction = "down"
-
+      };
+      for (let i = 1; i < snakeBody.length; i++) {
+        if (snakeBody[0].x == snakeBody[i].x && snakeBody[0].y == snakeBody[i].y) {
+          Gameover = true
+          console.log("Game Over")
+          snakeBody.length = 0
+          food.clear()
+        }
+      }
+      if (Gameover == false) {
+        if (snakeBody[0].x == foodX && snakeBody[0].y == foodY) {
+          storeCoordinate(foodX, foodY, snakeBody)
+          drawFood()
+        }
       }
     }
 
@@ -134,22 +172,19 @@
       document.removeEventListener('keydown', onKeyDown);
     }
 
-    // Initialise the food (coordination have to added itself)
-    // const food = new PIXI.Graphics()
-    // food.lineStyle(0)
-    // food.beginFill("#2a2b2a", 1);
-    // food.drawStar(22.5, 22.5, 4, 12.5);
-    // food.endFill();
+
 
     // Start new round of a game
     function newRound() {
-      let elapsed = 0.0;
+      storeCoordinate(10, 4, snakeBody)
       storeCoordinate(10, 3, snakeBody)
       storeCoordinate(10, 2, snakeBody)
       storeCoordinate(10, 1, snakeBody)
+      drawFood()
+      let elapsed = 0.0;
       app.ticker.add((delta) => {
         elapsed += Math.round(delta)
-        if (elapsed % 10 == 0) {
+        if (elapsed % 10 == 0 && Gameover == false) {
           // Add the 'keydown' event listener to our document
           document.addEventListener('keydown', onKeyDown);
           updateSnake()
