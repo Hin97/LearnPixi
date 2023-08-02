@@ -6,8 +6,14 @@
   <script src="js/graphics-extras.js"></script>
   <style>
     body {
+      padding: 100px 0;
+      margin: auto;
       width: 621px;
-      height: 496px;
+    }
+
+    canvas {
+      width: 100%;
+      text-align: center;
     }
 
     #home {
@@ -44,7 +50,7 @@
   </div>
   <script>
     // Set up the application
-    const app = new PIXI.Application({ width: 621, height: 496, background: "#1099bb" })
+    const app = new PIXI.Application({ width: 605, height: 480, background: "#1099bb" })
     const snake = new PIXI.Graphics()
     const food = new PIXI.Graphics()
     // Initialise game components
@@ -52,7 +58,6 @@
     const foodSize = 12.5;
     var foodX
     var foodY
-
     const snakeBody = [];
     var Gameover = true;
     var direction = "down"
@@ -177,29 +182,29 @@
 
     // Function to control the direction of the snake movement
     function onKeyDown(key) {
-
-      // W Key is 87 and Up arrow is 38
-      if (key.keyCode === 87 || key.keyCode === 38) {
-        if (direction !== "down") {
-          direction = "up"
+      if (Gameover == false) { // W Key is 87 and Up arrow is 38
+        if (key.keyCode === 87 || key.keyCode === 38) {
+          if (direction !== "down") {
+            direction = "up"
+          }
         }
-      }
-      // S Key is 83 and Down arrow is 40
-      if (key.keyCode === 83 || key.keyCode === 40) {
-        if (direction !== "up") {
-          direction = "down"
+        // S Key is 83 and Down arrow is 40
+        if (key.keyCode === 83 || key.keyCode === 40) {
+          if (direction !== "up") {
+            direction = "down"
+          }
         }
-      }
-      // A Key is 65 and Left arrow is 37
-      if (key.keyCode === 65 || key.keyCode === 37) {
-        if (direction !== "right") {
-          direction = "left"
+        // A Key is 65 and Left arrow is 37
+        if (key.keyCode === 65 || key.keyCode === 37) {
+          if (direction !== "right") {
+            direction = "left"
+          }
         }
-      }
-      // D Key is 68 and Right arrow is 39
-      if (key.keyCode === 68 || key.keyCode === 39) {
-        if (direction !== "left") {
-          direction = "right"
+        // D Key is 68 and Right arrow is 39
+        if (key.keyCode === 68 || key.keyCode === 39) {
+          if (direction !== "left") {
+            direction = "right"
+          }
         }
       }
       // Add the 'keydown' event listener to our document
